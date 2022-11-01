@@ -1,21 +1,23 @@
 #!/bin/bash
 
 
-ROOTDIR=$(cd "$(dirname "$0")" && pwd)
-export PATH=${ROOTDIR}/bin:${PWD}/bin:$PATH
-export FABRIC_CFG_PATH=${PWD}/configtx
-export VERBOSE=false
+#ROOTDIR=$(cd "$(dirname "$0")" && pwd)
+#export PATH=${ROOTDIR}/bin:${PWD}/bin:$PATH
+    #export FABRIC_CFG_PATH=${PWD}/configtx
+    #export VERBOSE=false
 
 # push to the required directory & set a trap to go back if needed
-pushd ${ROOTDIR} > /dev/null
-trap "popd > /dev/null" EXIT
+#pushd ${ROOTDIR} > /dev/null
+#trap "popd > /dev/null" EXIT
 
-. scripts/utils.sh  #import
+#. scripts/utils.sh  #import
 
-: ${CONTAINER_CLI:="docker"}
-: ${CONTAINER_CLI_COMPOSE:="${CONTAINER_CLI}-compose"}
-infoln "Using ${CONTAINER_CLI} and ${CONTAINER_CLI_COMPOSE}"
+#: ${CONTAINER_CLI:="docker"}
+#: ${CONTAINER_CLI_COMPOSE:="${CONTAINER_CLI}-compose"}
+#infoln "Using ${CONTAINER_CLI} and ${CONTAINER_CLI_COMPOSE}"
 
+
+. env.sh #import
 
 function checkPrereqs() {
 
@@ -42,99 +44,6 @@ function checkPrereqs() {
 }
 
 
-# Before you can bring up a network, each organization needs to generate the crypto
-# material that will define that organization on the network. Because Hyperledger
-# Fabric is a permissioned blockchain, each node and user on the network needs to
-# use certificates and keys to sign and verify its actions. In addition, each user
-# needs to belong to an organization that is recognized as a member of the network.
-# You can use the Cryptogen tool or Fabric CAs to generate the organization crypto
-# material.
-
-# By default, the sample network uses cryptogen. Cryptogen is a tool that is
-# meant for development and testing that can quickly create the certificates and keys
-# that can be consumed by a Fabric network. The cryptogen tool consumes a series
-# of configuration files for each organization in the "organizations/cryptogen"
-# directory. Cryptogen uses the files to generate the crypto  material for each
-# org in the "organizations" directory.
-
-# You can also use Fabric CAs to generate the crypto material. CAs sign the certificates
-# and keys that they generate to create a valid root of trust for each organization.
-# The script uses Docker Compose to bring up three CAs, one for each peer organization
-# and the ordering organization. The configuration file for creating the Fabric CA
-# servers are in the "organizations/fabric-ca" directory. Within the same directory,
-# the "registerEnroll.sh" script uses the Fabric CA client to create the identities,
-# certificates, and MSP folders that are needed to create the test network in the
-# "organizations/ordererOrganizations" directory.
-
-# Create Organization crypto material using cryptogen or CAs
-function createOrgs() {
-  if [ -d "organizations/peerOrganizations" ]; then
-    rm -Rf organizations/peerOrganizations && rm -Rf organizations/ordererOrganizations
-  fi
-
-  # Create crypto material using cryptogen
-  if [ "$CRYPTO" == "cryptogen" ]; then
-    which cryptogen
-    if [ "$?" -ne 0 ]; then
-      fatalln "cryptogen tool not found. exiting"
-    fi
-    infoln "Generating certificates using cryptogen tool"
-
-    infoln "Creating Org1 Identities"
-
-    set -x
-     cryptogen generate --config=./organizations/cryptogen/crypto-config-org1.yaml --output="organizations"
-    res=$?
-    { set +x; } 2>/dev/null
-    if [ $res -ne 0 ]; then
-      fatalln "Failed to generate certificates..."
-    fi
-
-    infoln "Creating Orderer Org Identities"
-
-    set -x
-    cryptogen generate --config=./organizations/cryptogen/crypto-config-orderer.yaml --output="organizations"
-    res=$?
-    { set +x; } 2>/dev/null
-    if [ $res -ne 0 ]; then
-      fatalln "Failed to generate certificates..."
-    fi
-
-  fi
-
-  # Create crypto material using Fabric CA
-  if [ "$CRYPTO" == "Certificate Authorities" ]; then
-    infoln "Generating certificates using Fabric CA"
-    ${CONTAINER_CLI_COMPOSE} -f compose/$COMPOSE_FILE_CA -f compose/$CONTAINER_CLI/${CONTAINER_CLI}-$COMPOSE_FILE_CA up -d 2>&1
-
-    . organizations/fabric-ca/registerEnroll.sh
-
-    while :
-    do
-      if [ ! -f "organizations/fabric-ca/org1/tls-cert.pem" ]; then
-        sleep 1
-      else
-        break
-      fi
-    done
-
-    infoln "Creating Org1 Identities"
-
-    createOrg1
-
-#    infoln "Creating Org2 Identities"
-
-#    createOrg2
-
-    infoln "Creating Orderer Org Identities"
-
-    createOrderer
- 
-  fi
-
-  infoln "Generating CCP files for Org1 and Org2"
-  ./organizations/ccp-generate.sh
-}
 
 function caDown() {
 
@@ -160,15 +69,6 @@ function caUp() {
   DOCKER_SOCK=$DOCKER_SOCK ${CONTAINER_CLI_COMPOSE} ${COMPOSE_CA_FILES} up -d 2>&1
 }
 
-
-# Using crpto vs CA. default is cryptogen
-CRYPTO="cryptogen"
-# certificate authorities compose file
-COMPOSE_FILE_CA=compose-ca.yaml
-
-# Get docker sock path from environment variable
-SOCK="${DOCKER_HOST:-/var/run/docker.sock}"
-DOCKER_SOCK="${SOCK##unix://}"
 
 # when terminate CAs, default is not to remove fabric ca artifacts
 CLEAR="false"
@@ -207,11 +107,11 @@ while [[ $# -ge 1 ]] ; do
 done
 
 # Are we generating crypto material with this command?
-if [ ! -d "organizations/peerOrganizations" ]; then
-  CRYPTO_MODE="with crypto from '${CRYPTO}'"
-else
-  CRYPTO_MODE=""
-fi
+#if [ ! -d "organizations/peerOrganizations" ]; then
+#  CRYPTO_MODE="with crypto from '${CRYPTO}'"
+#else
+#  CRYPTO_MODE=""
+#fi
 
 # Determine mode of operation and printing out what we asked for
 if [ "$MODE" == "up" ]; then

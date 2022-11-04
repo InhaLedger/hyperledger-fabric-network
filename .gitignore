@@ -1,2 +1,6 @@
 organizations/peerOrganizations
 organizations/ordererOrganizations
+
+channel-artifacts
+
+log.*

@@ -1,67 +1,70 @@
 package com.inha.coinkaraoke.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
-import java.nio.charset.StandardCharsets;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.contract.annotation.DataType;
 import org.hyperledger.fabric.contract.annotation.Property;
-import org.json.JSONObject;
+import org.hyperledger.fabric.shim.ChaincodeException;
+
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.TreeMap;
 
 @Slf4j
 @DataType
-@Setter(AccessLevel.PRIVATE)
+@Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonPropertyOrder({"ownerId", "availableBalance", "stakedBalance", "stakeList"})
 public class Account extends Entity {
 
     @Property private String ownerId;
-    @Property private Double balance;
+    @Property private Double availableBalance;
+    @Property private Double stakedBalance;
+    @Property private TreeMap<Long, Stake> stakeList;
 
-    @Override
-    public byte[] serialize() {
-
-        JSONObject json = new JSONObject();
-        json.put("ownerId", this.ownerId);
-        json.put("balance", this.balance);
-
-        log.info("complete serializing object: {} \n{}", this.key, json);
-        return json.toString().getBytes(StandardCharsets.UTF_8);
-    }
 
     @Override
     protected void makeKey() {
-        this.key = String.join(INDEX_KEY_DELIMITER, this.getClass().getName(), ownerId);
+        this.key = String.join(INDEX_KEY_DELIMITER, ownerId);
     }
 
-    public Double getBalance() {
-        return balance;
+    @JsonIgnore
+    public Double getTotalBalance() {
+        return availableBalance + stakedBalance;
     }
 
-    public static class Builder {
+    public void stake(Double amount) {
+        if (availableBalance < amount)
+            throw new ChaincodeException("not enough available balance to stake.");
 
-        private Account instance;
+        this.availableBalance -= amount;
+        this.stakedBalance += amount;
+    }
 
-        public Builder() {
+    public void transfer(Double amount) {
+        if (availableBalance < amount)
+            throw new ChaincodeException("not enough available balance to stake.");
 
-            this.instance = new Account();
-        }
+        this.availableBalance -= amount;
+    }
 
-        public Builder createInstance(String ownerId, Double balance) {
+    public void receive(Double amount) {
+        this.availableBalance += amount;
+    }
 
-            this.instance.setOwnerId(ownerId);
-            this.instance.setBalance(balance);
 
-            return this;
-        }
-
-        public Account get() {
-
-            this.instance.makeKey();
-
-            return this.instance;
-        }
+    public Account(String ownerId) {
+        this.ownerId = ownerId;
+        this.stakeList = new TreeMap<>((Comparator<Long> & Serializable) Long::compareTo);  // serializable 하도록 comparator 설정
+        this.availableBalance = 0.0d;
+        this.stakedBalance = 0.0d;
+        this.makeKey();
     }
 
 }

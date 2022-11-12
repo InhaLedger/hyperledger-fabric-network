@@ -1,8 +1,8 @@
 package com.inha.coinkaraoke.ledgerApi.impl;
 
 import com.inha.coinkaraoke.entity.Account;
-import com.inha.coinkaraoke.entity.AccountHistory;
-import com.inha.coinkaraoke.entity.AccountHistory.Builder;
+import com.inha.coinkaraoke.entity.TransferHistory;
+import com.inha.coinkaraoke.entity.TransferHistory.Builder;
 import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManager;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManagerProvider;
@@ -14,14 +14,13 @@ import org.hyperledger.fabric.shim.ChaincodeException;
  */
 public class AccountServiceImpl implements AccountService {
 
-    private final EntityManager<AccountHistory> historyManager;  // UTXO based model
+    private final EntityManager<TransferHistory> historyManager;  // UTXO based model
     private final EntityManager<Account> accountManager;  // account-based model
 
-    public Double getBalance(final Context ctx, String userId) {
+    public Account getBalance(final Context ctx, String userId) {
 
         return accountManager.getById(ctx.getStub(), userId)
-                .map(Account::getBalance)
-                .orElse(0.0d);
+                .orElse(new Account(userId));
     }
 
     /**
@@ -29,41 +28,33 @@ public class AccountServiceImpl implements AccountService {
      * because of the CouchDB's MVCC feature. To avoid version conflict, we need to make the interval
      * short as possible between read and write. Also to prevent double-spend problem as possible,
      * sender account request is processed first, receiver account is next and then total transfer history is recorded.
-     * @param ctx
      * @param senderId subjectDN of the X.509 certificate
      * @param receiverId subjectDN of the X.509 certificate
      * @param timestamp request timestamp
      * @param amount total token amount to be transferred.
+     * @exception ChaincodeException occurred when sender doesn't have enough available coins
      */
     public void transfer(final Context ctx, String senderId, String receiverId, Long timestamp, Double amount) {
 
-        Double senderBalance = this.getBalance(ctx, senderId);
-        if (senderBalance < amount) {
-            throw new ChaincodeException("not enough account balance!");
-        }
-
         //sender
-        Account senderAccount = new Account.Builder()
-                .createInstance(senderId, senderBalance - amount)
-                .get();
+        Account senderAccount = this.getBalance(ctx, senderId);
+        senderAccount.transfer(amount);
         accountManager.updateEntity(ctx.getStub(), senderAccount);
 
         //receiver
-        Double newBalance = this.getBalance(ctx, receiverId) + amount;
-        Account receiverAccount = new Account.Builder()
-                .createInstance(receiverId, newBalance)
-                .get();
+        Account receiverAccount = this.getBalance(ctx, receiverId);
+        receiverAccount.receive(amount);
         accountManager.updateEntity(ctx.getStub(), receiverAccount);
 
         //history
-        AccountHistory history = new Builder()
+        TransferHistory history = new Builder()
                 .createInstance(senderId, receiverId, timestamp, amount)
                 .get();
         historyManager.saveEntity(ctx.getStub(), history);
     }
 
     private AccountServiceImpl() {
-        this.historyManager = EntityManagerProvider.getInstance(AccountHistory.class);
+        this.historyManager = EntityManagerProvider.getInstance(TransferHistory.class);
         this.accountManager = EntityManagerProvider.getInstance(Account.class);
     }
 

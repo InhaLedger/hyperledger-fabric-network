@@ -1,20 +1,21 @@
 package com.inha.coinkaraoke.entity;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
-import java.nio.charset.StandardCharsets;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.contract.annotation.DataType;
 import org.hyperledger.fabric.contract.annotation.Property;
-import org.json.JSONObject;
 
 @DataType
 @Slf4j
-@Setter(AccessLevel.PRIVATE)
+@Getter @Setter(AccessLevel.PRIVATE)
+@JsonPropertyOrder({"senderId", "receiverId", "amount", "timestamp", "remarks"})
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccountHistory extends Entity {
+public class TransferHistory extends Entity {
 
     @Property private double amount;
     @Property private Long timestamp;
@@ -24,37 +25,16 @@ public class AccountHistory extends Entity {
 
     @Override
     protected void makeKey() {
-        this.key = String.join(INDEX_KEY_DELIMITER, this.getClass().getName(), this.timestamp.toString());
+        this.key = String.join(INDEX_KEY_DELIMITER, this.timestamp.toString(), this.senderId, this.receiverId);
     }
-
-    @Override
-    public String getKey() {
-        return null;
-    }
-
-    @Override
-    public byte[] serialize() {
-
-        JSONObject json = new JSONObject();
-        json.put("senderId", senderId);
-        json.put("receiverId", receiverId);
-        json.put("amount", amount);
-        json.put("timestamp", timestamp);
-        json.put("remarks", remarks);
-
-        log.info("complete serializing object: {} \n{}", this.key, json);
-        return json.toString().getBytes(StandardCharsets.UTF_8);
-    }
-
-
 
     public static class Builder {
 
-        private AccountHistory instance;
+        private final TransferHistory instance;
 
         public Builder() {
 
-            this.instance = new AccountHistory();
+            this.instance = new TransferHistory();
         }
 
         public Builder createInstance(String senderId, String receiverId, Double amount, Long timestamp, String remark) {
@@ -79,7 +59,7 @@ public class AccountHistory extends Entity {
             return this;
         }
 
-        public AccountHistory get() {
+        public TransferHistory get() {
 
             this.instance.makeKey();
 

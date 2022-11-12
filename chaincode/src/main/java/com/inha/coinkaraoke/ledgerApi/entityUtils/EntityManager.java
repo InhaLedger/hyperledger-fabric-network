@@ -1,53 +1,47 @@
 package com.inha.coinkaraoke.ledgerApi.entityUtils;
 
-import com.google.gson.Gson;
-import java.lang.reflect.Type;
-import java.util.Optional;
 import org.hyperledger.fabric.contract.annotation.Transaction;
 import org.hyperledger.fabric.contract.annotation.Transaction.TYPE;
 import org.hyperledger.fabric.shim.ChaincodeStub;
 import org.hyperledger.fabric.shim.ledger.CompositeKey;
-import org.json.JSONObject;
+
+import java.util.Optional;
 
 public class EntityManager<T extends Entity> {
 
-    private final String typeName;
+    private final Class<T> type;
 
-    private EntityManager(String typeName) {
-        this.typeName = typeName;
+    private EntityManager(Class<T> type) {
+        this.type = type;
     }
 
     @Transaction(intent = TYPE.SUBMIT)
     public void saveEntity(ChaincodeStub stub, T entity) {
 
-        CompositeKey compositeKey = stub.createCompositeKey(typeName,
+        CompositeKey compositeKey = stub.createCompositeKey(type.getSimpleName(),
                 Entity.splitKey(entity.getKey()));
-        byte[] data = entity.serialize();
+        byte[] data = ObjectMapperHolder.serialize(entity);
         stub.putState(compositeKey.toString(), data);
     }
 
     @Transaction(intent = TYPE.SUBMIT)
     public void updateEntity(ChaincodeStub stub, T entity) {
 
-        CompositeKey compositeKey = stub.createCompositeKey(typeName,
+        CompositeKey compositeKey = stub.createCompositeKey(type.getSimpleName(),
                 Entity.splitKey(entity.getKey()));
-        byte[] data = entity.serialize();
+        byte[] data = ObjectMapperHolder.serialize(entity);
         stub.putState(compositeKey.toString(), data);
     }
 
     @Transaction(intent = TYPE.EVALUATE)
     public Optional<T> getById(ChaincodeStub stub, String key) {
 
-        CompositeKey compositeKey = stub.createCompositeKey(typeName, Entity.splitKey(key));
+        CompositeKey compositeKey = stub.createCompositeKey(type.getSimpleName(), Entity.splitKey(key));
         byte[] data = stub.getState(compositeKey.toString());
-        String json = new JSONObject(data).toString();
 
         T object = null;
-        try {
-            object = new Gson().fromJson(json, (Type) Class.forName(typeName));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        if(data != null && data.length > 0)
+            object = ObjectMapperHolder.deserialize(data, type);
 
         return Optional.ofNullable(object);
     }
@@ -60,7 +54,7 @@ public class EntityManager<T extends Entity> {
 
         public <T extends Entity> EntityManager<T> factory(Class<T> cls) {
 
-            return new EntityManager<>(cls.getName());
+            return new EntityManager<>(cls);
         }
     }
 

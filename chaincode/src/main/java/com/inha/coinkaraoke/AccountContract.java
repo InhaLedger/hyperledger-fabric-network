@@ -1,5 +1,6 @@
 package com.inha.coinkaraoke;
 
+import com.inha.coinkaraoke.entity.Account;
 import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.impl.AccountServiceImpl;
 import org.hyperledger.fabric.contract.Context;
@@ -34,7 +35,7 @@ public class AccountContract implements ContractInterface {
 
 
     @Transaction(intent = TYPE.EVALUATE)
-    public Double getBalance(final Context ctx) {
+    public Account getBalance(final Context ctx) {
 
         String clientId = ContractUtils.getClientId(ctx);
         logger.info("[Account Contract] call getBalance : {}", clientId);

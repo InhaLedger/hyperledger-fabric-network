@@ -1,18 +1,8 @@
 package com.inha.coinkaraoke.accounts;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-
 import com.inha.coinkaraoke.AccountContract;
+import com.inha.coinkaraoke.entity.Account;
 import com.inha.coinkaraoke.ledgerApi.AccountService;
-import java.security.Principal;
-import java.security.cert.X509Certificate;
 import org.assertj.core.api.Assertions;
 import org.hyperledger.fabric.contract.ClientIdentity;
 import org.hyperledger.fabric.contract.Context;
@@ -22,6 +12,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.security.Principal;
+import java.security.cert.X509Certificate;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountContractTest {
@@ -52,13 +51,14 @@ public class AccountContractTest {
     public void getBalanceTest() {
 
         //given
-        given(accountService.getBalance(any(), anyString())).willReturn(0.0d);
+        Account account = new Account("user1");
+        given(accountService.getBalance(any(), anyString())).willReturn(account);
 
         //when
-        Double returnedBalance = contract.getBalance(ctx);
+        Account returnedAccount = contract.getBalance(ctx);
 
         //then
-        Assertions.assertThat(returnedBalance).isEqualTo(0.0d);
+        Assertions.assertThat(returnedAccount).isEqualTo(account);
         then(accountService).should(times(1))
                 .getBalance(any(), anyString());
     }

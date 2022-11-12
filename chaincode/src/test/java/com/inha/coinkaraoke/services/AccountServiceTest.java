@@ -51,7 +51,7 @@ public class AccountServiceTest {
             Account expectedAccount = new Account("user1");
             given(entityManager.getById(any(), any(), any())).willReturn(Optional.empty());
 
-            Account returned = accountService.getBalance(ctx, "user1");
+            Account returned = accountService.getAccount(ctx, "user1");
 
             assertThat(returned)
                     .usingRecursiveComparison()
@@ -65,10 +65,9 @@ public class AccountServiceTest {
 
             Account existedAccount = new Account("user1");
             existedAccount.receive(543.365);
-            existedAccount.stake(23.1);
             given(entityManager.getById(any(), eq("user1"), any())).willReturn(Optional.of(existedAccount));
 
-            Account returned = accountService.getBalance(ctx, "user1");
+            Account returned = accountService.getAccount(ctx, "user1");
 
             assertThat(returned)
                     .usingRecursiveComparison()

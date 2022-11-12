@@ -1,6 +1,7 @@
 package com.inha.coinkaraoke;
 
 import com.inha.coinkaraoke.entity.Account;
+import com.inha.coinkaraoke.entity.Stake;
 import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.impl.AccountServiceImpl;
 import org.hyperledger.fabric.contract.Context;
@@ -22,7 +23,7 @@ public class AccountContract implements ContractInterface {
     private static final String ROLE_ATTRIBUTE = "role";
     private static final String ROLE_ADMIN = "admin";
 
-    private final AccountService accountService; //= AccountServiceImpl.getInstance();
+    private final AccountService accountService;
 
     public AccountContract() {
         this.accountService= AccountServiceImpl.getInstance();
@@ -35,12 +36,21 @@ public class AccountContract implements ContractInterface {
 
 
     @Transaction(intent = TYPE.EVALUATE)
-    public Account getBalance(final Context ctx) {
+    public Account getAccount(final Context ctx) {
 
         String clientId = ContractUtils.getClientId(ctx);
         logger.info("[Account Contract] call getBalance : {}", clientId);
 
-        return this.accountService.getBalance(ctx, clientId);
+        return this.accountService.getAccount(ctx, clientId);
+    }
+
+    @Transaction
+    public Stake createStakeToEdit(final Context ctx, Long timestamp) {
+
+        String clientId = ContractUtils.getClientId(ctx);
+        logger.info("[Account Contract] call createStakeToEdit : {}", clientId);
+
+        return accountService.stakeToEdit(ctx, clientId, timestamp);
     }
 
     @Transaction(intent = TYPE.SUBMIT)

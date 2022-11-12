@@ -52,15 +52,15 @@ public class AccountContractTest {
 
         //given
         Account account = new Account("user1");
-        given(accountService.getBalance(any(), anyString())).willReturn(account);
+        given(accountService.getAccount(any(), anyString())).willReturn(account);
 
         //when
-        Account returnedAccount = contract.getBalance(ctx);
+        Account returnedAccount = contract.getAccount(ctx);
 
         //then
         Assertions.assertThat(returnedAccount).isEqualTo(account);
         then(accountService).should(times(1))
-                .getBalance(any(), anyString());
+                .getAccount(any(), anyString());
     }
 
     @Test

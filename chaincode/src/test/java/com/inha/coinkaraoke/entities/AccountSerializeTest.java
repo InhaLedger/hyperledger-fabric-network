@@ -39,7 +39,6 @@ public class AccountSerializeTest {
             //given
             Account originalAccount = new Account("user1");
             originalAccount.receive(23.8d);
-            originalAccount.stake(5.3d);
 
             //when
             byte[] bytes = ObjectMapperHolder.serialize(originalAccount);

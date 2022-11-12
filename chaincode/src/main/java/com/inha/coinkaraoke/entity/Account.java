@@ -39,12 +39,14 @@ public class Account extends Entity {
         return availableBalance + stakedBalance;
     }
 
-    public void stake(Double amount) {
+    public void addStake(Stake stake) {
+        Double amount = stake.getAmount();
         if (availableBalance < amount)
             throw new ChaincodeException("not enough available balance to stake.");
 
         this.availableBalance -= amount;
         this.stakedBalance += amount;
+        this.stakeList.put(stake.getCompleteTimestamp(), stake);
     }
 
     public void transfer(Double amount) {
@@ -57,7 +59,6 @@ public class Account extends Entity {
     public void receive(Double amount) {
         this.availableBalance += amount;
     }
-
 
     public Account(String ownerId) {
         this.ownerId = ownerId;

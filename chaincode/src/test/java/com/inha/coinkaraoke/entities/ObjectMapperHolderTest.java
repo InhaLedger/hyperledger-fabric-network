@@ -1,4 +1,4 @@
-package com.inha.coinkaraoke.entityUtilsTest;
+package com.inha.coinkaraoke.entities;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,10 +32,10 @@ public class ObjectMapperHolderTest {
     @JsonPropertyOrder({"age", "gender", "address", "name"})
     static class TestEntity extends Entity implements Serializable {
 
-        private String name;
-        private Integer age;
-        private String address;
-        private String gender;
+        private final String name;
+        private final Integer age;
+        private final String address;
+        private final String gender;
 
         public TestEntity(String name, Integer age, String address, String gender) {
             this.name = name;

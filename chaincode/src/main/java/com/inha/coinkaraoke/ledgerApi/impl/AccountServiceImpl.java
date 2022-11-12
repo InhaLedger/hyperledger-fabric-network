@@ -53,13 +53,16 @@ public class AccountServiceImpl implements AccountService {
         historyManager.saveEntity(ctx.getStub(), history);
     }
 
-    private AccountServiceImpl() {
-        this.historyManager = EntityManagerProvider.getInstance(TransferHistory.class);
-        this.accountManager = EntityManagerProvider.getInstance(Account.class);
+    private AccountServiceImpl(EntityManager<TransferHistory> historyManager, EntityManager<Account> accountManager) {
+        this.historyManager = historyManager;
+        this.accountManager = accountManager;
     }
 
     private static class LazyHolder {
-        public static final AccountServiceImpl INSTANCE = new AccountServiceImpl();
+        public static final AccountServiceImpl INSTANCE = new AccountServiceImpl(
+                EntityManagerProvider.getInstance(TransferHistory.class),
+                EntityManagerProvider.getInstance(Account.class)
+        );
     }
 
     public static AccountServiceImpl getInstance() {

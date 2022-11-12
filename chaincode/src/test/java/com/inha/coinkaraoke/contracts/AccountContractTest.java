@@ -1,4 +1,4 @@
-package com.inha.coinkaraoke.accounts;
+package com.inha.coinkaraoke.contracts;
 
 import com.inha.coinkaraoke.AccountContract;
 import com.inha.coinkaraoke.entity.Account;

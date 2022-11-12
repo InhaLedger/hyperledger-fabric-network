@@ -1,4 +1,4 @@
-package com.inha.coinkaraoke.accounts;
+package com.inha.coinkaraoke.entities;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

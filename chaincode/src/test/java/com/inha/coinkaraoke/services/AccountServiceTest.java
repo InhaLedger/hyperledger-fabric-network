@@ -1,7 +1,6 @@
 package com.inha.coinkaraoke.services;
 
 import com.inha.coinkaraoke.entity.Account;
-import com.inha.coinkaraoke.entity.TransferHistory;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManager;
 import com.inha.coinkaraoke.ledgerApi.impl.AccountServiceImpl;
 import org.hyperledger.fabric.contract.Context;
@@ -11,9 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,26 +24,22 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
 
+    @InjectMocks
     private AccountServiceImpl accountService;
-    private EntityManager<Account> accountManager;
-    private EntityManager<TransferHistory> historyManager;
+
+    @Mock
+    private EntityManager entityManager;
+
     private Context ctx;
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
-    public void setUp() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void setUp() {
         ctx = mock(Context.class);
         ChaincodeStub stub = mock(ChaincodeStub.class);
         when(ctx.getStub()).thenReturn(stub);
-
-        accountManager = (EntityManager<Account>) mock(EntityManager.class);
-        historyManager = (EntityManager<TransferHistory>) mock(EntityManager.class);
-
-        Constructor<AccountServiceImpl> constructor = AccountServiceImpl.class.getDeclaredConstructor(EntityManager.class, EntityManager.class);
-        constructor.setAccessible(true);
-        accountService = constructor.newInstance(historyManager, accountManager);
     }
 
     @Nested
@@ -52,14 +49,14 @@ public class AccountServiceTest {
         public void successToMakeAccountInfoTest() {
 
             Account expectedAccount = new Account("user1");
-            given(accountManager.getById(any(), any())).willReturn(Optional.empty());
+            given(entityManager.getById(any(), any(), any())).willReturn(Optional.empty());
 
             Account returned = accountService.getBalance(ctx, "user1");
 
             assertThat(returned)
                     .usingRecursiveComparison()
                     .isEqualTo(expectedAccount);
-            then(accountManager).should(times(1)).getById(any(), any());
+            then(entityManager).should(times(1)).getById(any(), any(), any());
         }
 
         @Test
@@ -69,14 +66,14 @@ public class AccountServiceTest {
             Account existedAccount = new Account("user1");
             existedAccount.receive(543.365);
             existedAccount.stake(23.1);
-            given(accountManager.getById(any(), eq("user1"))).willReturn(Optional.of(existedAccount));
+            given(entityManager.getById(any(), eq("user1"), any())).willReturn(Optional.of(existedAccount));
 
             Account returned = accountService.getBalance(ctx, "user1");
 
             assertThat(returned)
                     .usingRecursiveComparison()
                     .isEqualTo(existedAccount);
-            then(accountManager).should(times(1)).getById(any(), any());
+            then(entityManager).should(times(1)).getById(any(), any(), any());
         }
     }
 
@@ -103,14 +100,14 @@ public class AccountServiceTest {
             Account sender = new Account(senderId);
             sender.receive(100.0);
             Account receiver = new Account(receiverId);
-            given(accountManager.getById(any(), eq(senderId))).willReturn(Optional.of(sender));
-            given(accountManager.getById(any(), eq(receiverId))).willReturn(Optional.of(receiver));
-            doNothing().when(historyManager).saveEntity(any(), any());
+            given(entityManager.getById(any(), eq(senderId), any())).willReturn(Optional.of(sender));
+            given(entityManager.getById(any(), eq(receiverId), any())).willReturn(Optional.of(receiver));
+            doNothing().when(entityManager).saveEntity(any(), any());
 
             accountService.transfer(ctx, senderId, receiverId, 12313243L, 13.2);
 
-            then(accountManager).should(times(2)).updateEntity(any(), any());
-            then(historyManager).should(times(1)).saveEntity(any(), any());
+            then(entityManager).should(times(2)).updateEntity(any(), any());
+            then(entityManager).should(times(1)).saveEntity(any(), any());
             assertThat(receiver.getAvailableBalance()).isEqualTo(13.2);
             assertThat(sender.getAvailableBalance()).isEqualTo(86.8);
         }

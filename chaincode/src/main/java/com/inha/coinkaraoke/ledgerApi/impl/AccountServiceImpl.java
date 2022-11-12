@@ -5,7 +5,6 @@ import com.inha.coinkaraoke.entity.TransferHistory;
 import com.inha.coinkaraoke.entity.TransferHistory.Builder;
 import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManager;
-import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManagerProvider;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.shim.ChaincodeException;
 
@@ -14,12 +13,11 @@ import org.hyperledger.fabric.shim.ChaincodeException;
  */
 public class AccountServiceImpl implements AccountService {
 
-    private final EntityManager<TransferHistory> historyManager;  // UTXO based model
-    private final EntityManager<Account> accountManager;  // account-based model
+    private final EntityManager entityManager;
 
     public Account getBalance(final Context ctx, String userId) {
 
-        return accountManager.getById(ctx.getStub(), userId)
+        return (Account) entityManager.getById(ctx.getStub(), userId, Account.class)
                 .orElse(new Account(userId));
     }
 
@@ -39,29 +37,28 @@ public class AccountServiceImpl implements AccountService {
         //sender
         Account senderAccount = this.getBalance(ctx, senderId);
         senderAccount.transfer(amount);
-        accountManager.updateEntity(ctx.getStub(), senderAccount);
+        entityManager.updateEntity(ctx.getStub(), senderAccount);
 
         //receiver
         Account receiverAccount = this.getBalance(ctx, receiverId);
         receiverAccount.receive(amount);
-        accountManager.updateEntity(ctx.getStub(), receiverAccount);
+        entityManager.updateEntity(ctx.getStub(), receiverAccount);
 
         //history
         TransferHistory history = new Builder()
                 .createInstance(senderId, receiverId, timestamp, amount)
                 .get();
-        historyManager.saveEntity(ctx.getStub(), history);
+        entityManager.saveEntity(ctx.getStub(), history);
     }
 
-    private AccountServiceImpl(EntityManager<TransferHistory> historyManager, EntityManager<Account> accountManager) {
-        this.historyManager = historyManager;
-        this.accountManager = accountManager;
+    private AccountServiceImpl(EntityManager entityManager) {
+
+        this.entityManager = entityManager;
     }
 
     private static class LazyHolder {
         public static final AccountServiceImpl INSTANCE = new AccountServiceImpl(
-                EntityManagerProvider.getInstance(TransferHistory.class),
-                EntityManagerProvider.getInstance(Account.class)
+                EntityManager.Factory.getInstance()
         );
     }
 

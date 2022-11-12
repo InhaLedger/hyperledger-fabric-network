@@ -22,4 +22,9 @@ public abstract class Entity implements Serializable {
         return key;
     }
 
+    @JsonIgnore
+    public String getSimpleClassName() {
+        return this.getClass().getSimpleName();
+    }
+
 }

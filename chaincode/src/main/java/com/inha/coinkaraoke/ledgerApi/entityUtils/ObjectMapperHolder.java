@@ -21,10 +21,11 @@ public class ObjectMapperHolder {
         }
     }
 
-    public static <T extends Entity> T deserialize(byte[] data, Class<T> cls) {
+    @SuppressWarnings("unchecked")
+    public static <T extends Entity> T deserialize(byte[] data, Class<?> cls) {
 
         try {
-            T entity = objectMapper.readValue(data, cls);
+            T entity = (T) objectMapper.readValue(data, cls);
             entity.makeKey();
 
             return entity;

@@ -7,54 +7,49 @@ import org.hyperledger.fabric.shim.ledger.CompositeKey;
 
 import java.util.Optional;
 
-public class EntityManager<T extends Entity> {
+public class EntityManager {
 
-    private final Class<T> type;
-
-    private EntityManager(Class<T> type) {
-        this.type = type;
-    }
+    private EntityManager() {}
 
     @Transaction(intent = TYPE.SUBMIT)
-    public void saveEntity(ChaincodeStub stub, T entity) {
+    public void saveEntity(ChaincodeStub stub, Entity entity) {
 
-        CompositeKey compositeKey = stub.createCompositeKey(type.getSimpleName(),
+        CompositeKey compositeKey = stub.createCompositeKey(entity.getSimpleClassName(),
                 Entity.splitKey(entity.getKey()));
         byte[] data = ObjectMapperHolder.serialize(entity);
         stub.putState(compositeKey.toString(), data);
     }
 
     @Transaction(intent = TYPE.SUBMIT)
-    public void updateEntity(ChaincodeStub stub, T entity) {
+    public void updateEntity(ChaincodeStub stub, Entity entity) {
 
-        CompositeKey compositeKey = stub.createCompositeKey(type.getSimpleName(),
+        CompositeKey compositeKey = stub.createCompositeKey(entity.getSimpleClassName(),
                 Entity.splitKey(entity.getKey()));
         byte[] data = ObjectMapperHolder.serialize(entity);
         stub.putState(compositeKey.toString(), data);
     }
 
     @Transaction(intent = TYPE.EVALUATE)
-    public Optional<T> getById(ChaincodeStub stub, String key) {
+    public Optional<Entity> getById(ChaincodeStub stub, String key, Class<?> cls) {
 
-        CompositeKey compositeKey = stub.createCompositeKey(type.getSimpleName(), Entity.splitKey(key));
+        CompositeKey compositeKey = stub.createCompositeKey(cls.getSimpleName(), Entity.splitKey(key));
         byte[] data = stub.getState(compositeKey.toString());
 
-        T object = null;
+        Entity object = null;
         if(data != null && data.length > 0)
-            object = ObjectMapperHolder.deserialize(data, type);
+            object = ObjectMapperHolder.deserialize(data, cls);
 
         return Optional.ofNullable(object);
     }
 
 
+    public static class Factory {
 
-    public static class EntityManagerFactory {
+        static final EntityManager entityManager = new EntityManager();
 
-        public EntityManagerFactory() {}
+        public static EntityManager getInstance() {
 
-        public <T extends Entity> EntityManager<T> factory(Class<T> cls) {
-
-            return new EntityManager<>(cls);
+            return entityManager;
         }
     }
 

@@ -1,6 +1,7 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0'
     id 'java'
+    id 'application'
 }
 
 group 'org.coinkaraoke'
@@ -46,10 +47,14 @@ dependencies {
     implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.32'
 }
 
+application {
+    mainClass = 'org.hyperledger.fabric.contract.ContractRouter'
+}
+
 shadowJar {
     archiveBaseName.set('chaincode')
     archiveVersion.set('1.0')
-    manifest.attributes.put('Main-Class', 'org.hyperledger.fabric.contract.ContractRouter')
+    manifest.attributes.put('mainClassName', 'org.hyperledger.fabric.contract.ContractRouter')
 }
 
 test {

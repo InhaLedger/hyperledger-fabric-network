@@ -29,7 +29,7 @@ println "- DELAY: ${C_GREEN}${DELAY}${C_RESET}"
 println "- MAX_RETRY: ${C_GREEN}${MAX_RETRY}${C_RESET}"
 println "- VERBOSE: ${C_GREEN}${VERBOSE}${C_RESET}"
 
-FABRIC_CFG_PATH=$PWD/../config/
+FABRIC_CFG_PATH=$PWD/configtx/
 
 #User has not provided a name
 if [ -z "$CC_NAME" ] || [ "$CC_NAME" = "NA" ]; then
@@ -63,10 +63,11 @@ if [ "$CC_SRC_LANGUAGE" = "go" ]; then
 elif [ "$CC_SRC_LANGUAGE" = "java" ]; then
   CC_RUNTIME_LANGUAGE=java
 
-  rm -rf $CC_SRC_PATH/build/install/
+  rm -rf $CC_SRC_PATH/build/libs/
   infoln "Compiling Java code..."
   pushd $CC_SRC_PATH
   ./gradlew installDist
+ # mv "./build/libs/chaincode-1.0-all.jar" "./build/libs/$CC_NAME"
   popd
   successln "Finished compiling Java code"
   CC_SRC_PATH=$CC_SRC_PATH/build/install/$CC_NAME
@@ -121,14 +122,14 @@ packageChaincode() {
   successln "Chaincode is packaged"
 }
 
-## package the chaincode
+## package the 
 packageChaincode
 
-## Install chaincode on peer0.org1 and peer0.org2
-infoln "Installing chaincode on peer0.org1..."
-installChaincode 1
-infoln "Install chaincode on peer0.org2..."
-installChaincode 2
+## Install chaincode on peer0.org1 and peer1.org1
+infoln "Installing chaincode on peers in org1..."
+installChaincode 1 
+#infoln "Install chaincode on peer1.org1..."
+#installChaincode 1
 
 ## query whether the chaincode is installed
 queryInstalled 1
@@ -138,30 +139,30 @@ approveForMyOrg 1
 
 ## check whether the chaincode definition is ready to be committed
 ## expect org1 to have approved and org2 not to
-checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": false"
-checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": false"
+checkCommitReadiness 1 "\"Org1MSP\": true" #"\"Org2MSP\": false"
+#checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": false"
 
 ## now approve also for org2
-approveForMyOrg 2
+#approveForMyOrg 2
 
 ## check whether the chaincode definition is ready to be committed
 ## expect them both to have approved
-checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": true"
-checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": true"
+#checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": true"
+#checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": true"
 
 ## now that we know for sure both orgs have approved, commit the definition
-commitChaincodeDefinition 1 2
+commitChaincodeDefinition 1 #2
 
 ## query on both orgs to see that the definition committed successfully
 queryCommitted 1
-queryCommitted 2
+#queryCommitted 2
 
 ## Invoke the chaincode - this does require that the chaincode have the 'initLedger'
 ## method defined
 if [ "$CC_INIT_FCN" = "NA" ]; then
   infoln "Chaincode initialization is not required"
 else
-  chaincodeInvokeInit 1 2
+  chaincodeInvokeInit 1 #2
 fi
 
 exit 0

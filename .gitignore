@@ -1,6 +1,9 @@
 organizations/peerOrganizations
 organizations/ordererOrganizations
+organizations/fabric-ca
 
 channel-artifacts
 
 log.*
+
+*.tar.gz

@@ -8,3 +8,6 @@
 
 ### 3. Channel 구성하기
   - `./channel.sh  createChannel -ca -c {CHANNEL_NAME} [...options]`
+
+### 4. chaincode 배포하기
+  - `./channel.sh deployCC -ccn chaincode -ccp ./chaincode -ccl java [...options]`

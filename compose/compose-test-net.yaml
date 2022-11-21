@@ -12,13 +12,14 @@ volumes:
 
 networks:
   coinkaraoke:
-    name: fabric_Peers
+    name: fabric_peers
     external: true
 
 services:
 
   orderer.coinkaraoke.com:
     container_name: orderer.coinkaraoke.com
+    hostname: orderer.coinkaraoke.com
     image: hyperledger/fabric-orderer:latest
     labels:
       service: hyperledger-fabric
@@ -61,6 +62,7 @@ services:
 
   peer0.org1.coinkaraoke.com:
     container_name: peer0.org1.coinkaraoke.com
+    hostname: peer0.org1.coinkaraoke.com
     image: hyperledger/fabric-peer:latest
     labels:
       service: hyperledger-fabric
@@ -100,6 +102,7 @@ services:
 
   peer1.org1.coinkaraoke.com:
     container_name: peer1.org1.coinkaraoke.com
+    hostname: peer1.org1.coinkaraoke.com
     image: hyperledger/fabric-peer:latest
     labels:
       service: hyperledger-fabric

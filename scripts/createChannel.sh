@@ -34,7 +34,7 @@ createChannelGenesisBlock() {
 }
 
 createChannel() {
-	setGlobals 1
+	setGlobals 1 0
 	# Poll in case the raft leader is not set yet
 	local rc=1
 	local COUNTER=1
@@ -59,7 +59,8 @@ joinChannel() {
   fi
   
   ORG=$1
-  setGlobals $ORG
+  PEER=$2
+  setGlobals $ORG $PEER
 	local rc=1
 	local COUNTER=1
 	## Sometimes Join takes time, hence retry
@@ -73,7 +74,7 @@ joinChannel() {
 		COUNTER=$(expr $COUNTER + 1)
 	done
 	cat log.txt
-	verifyResult $res "After $MAX_RETRY attempts, peer0.org${ORG} has failed to join channel '$CHANNEL_NAME' "
+	verifyResult $res "After $MAX_RETRY attempts, peer${PEER}.org${ORG} has failed to join channel '$CHANNEL_NAME' "
 }
 
 setAnchorPeer() {
@@ -97,7 +98,8 @@ successln "Channel '$CHANNEL_NAME' created"
 
 ## Join all the peers to the channel
 infoln "Joining org1 peer to the channel..."
-joinChannel 1
+joinChannel 1 0
+joinChannel 1 1
 
 ## Set the anchor peers for each org in the channel
 infoln "Setting anchor peer for org1..."

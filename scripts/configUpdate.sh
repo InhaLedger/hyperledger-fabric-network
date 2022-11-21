@@ -15,8 +15,9 @@ fetchChannelConfig() {
   ORG=$1
   CHANNEL=$2
   OUTPUT=$3
-
-  setGlobals $ORG
+  PEER=0
+  
+  setGlobals $ORG $PEER
 
   infoln "Fetching the most recent configuration block for the channel"
   set -x

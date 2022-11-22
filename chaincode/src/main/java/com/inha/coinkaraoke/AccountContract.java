@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 public class AccountContract implements ContractInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountContract.class);
-    private static final String ROLE_ATTRIBUTE = "role";
-    private static final String ROLE_ADMIN = "admin";
 
     private final AccountService accountService;
 
@@ -63,25 +61,12 @@ public class AccountContract implements ContractInterface {
         this.accountService.transfer(ctx, senderId, receiverId, timestamp, amount);
     }
 
-//    /**
-//     * Only admin can create new tokens.
-//     * @param ctx
-//     * @param amounts
-//     */
-//    @Transaction(intent = TYPE.SUBMIT)
-//    public void mint(final Context ctx, double amounts) {
-//
-//        if (ctx.getClientIdentity().assertAttributeValue(ROLE_ATTRIBUTE, ROLE_ADMIN)) {
-//
-//            double balance = this.accountService.getBalance(ctx, ROLE_ADMIN);
-//            JSONObject toJson = new JSONObject();
-//            toJson.put("balance", balance + amounts);
-//            ctx.getStub().putState(ROLE_ADMIN, toJson.toString().getBytes(UTF_8));
-//
-//        } else {
-//            logger.warn("[{}]{} illegal access to mint method", ctx.getClientIdentity().getMSPID(),
-//                    ctx.getClientIdentity().getId());
-//            throw new ChaincodeException("only admin can access to mint new tokens");
-//        }
-//    }
+    @Transaction(intent = TYPE.SUBMIT)
+    public void mint(final Context ctx, Double amount) {
+
+        String clientId = ContractUtils.getClientId(ctx);
+        logger.info("[Account Contract] call mint : {} try to mint ({}) coins", clientId, amount);
+
+        this.accountService.mint(ctx, clientId, amount);
+    }
 }

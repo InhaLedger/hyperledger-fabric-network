@@ -6,6 +6,7 @@ import com.inha.coinkaraoke.entity.TransferHistory;
 import com.inha.coinkaraoke.entity.TransferHistory.Builder;
 import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManager;
+import java.util.Objects;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.shim.ChaincodeException;
 
@@ -23,27 +24,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Stake stakeToEdit(Context ctx, String userId, Long timestamp) {
+    public Stake stakeToEdit(Context ctx, String proposerId, Long timestamp) {
 
-        Stake stake = Stake.forEdit(userId, timestamp);
-        Account account = getAccount(ctx, userId);
+        Stake stake = Stake.forEdit(proposerId, timestamp);
+        Account account = getAccount(ctx, proposerId);
         account.addStake(stake);
         entityManager.saveEntity(ctx.getStub(), account);
 
         return stake;
     }
 
-    /**
-     * Note that the order of transactions is important. Account-based model can be failed easily
-     * because of the CouchDB's MVCC feature. To avoid version conflict, we need to make the interval
-     * short as possible between read and write. Also to prevent double-spend problem as possible,
-     * sender account request is processed first, receiver account is next and then total transfer history is recorded.
-     * @param senderId subjectDN of the X.509 certificate
-     * @param receiverId subjectDN of the X.509 certificate
-     * @param timestamp request timestamp
-     * @param amount total token amount to be transferred.
-     * @exception ChaincodeException occurred when sender doesn't have enough available coins
-     */
+    @Override
     public void transfer(final Context ctx, String senderId, String receiverId, Long timestamp, Double amount) {
 
         //sender
@@ -61,6 +52,19 @@ public class AccountServiceImpl implements AccountService {
                 .createInstance(senderId, receiverId, timestamp, amount)
                 .get();
         entityManager.saveEntity(ctx.getStub(), history);
+    }
+
+    @Override
+    public void mint(final Context ctx, String minterId, Double amount) {
+
+        if (Objects.equals(minterId, "admin")) {
+
+            Account adminAccount = this.getAccount(ctx, minterId);
+            adminAccount.receive(amount);
+            entityManager.updateEntity(ctx.getStub(), adminAccount);
+        } else {
+            throw new ChaincodeException("only admin can access to mint new tokens");
+        }
     }
 
     private AccountServiceImpl(EntityManager entityManager) {

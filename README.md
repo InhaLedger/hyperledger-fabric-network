@@ -1,5 +1,6 @@
 ### 1. CA 서버 구성하기
-  - `./ca.sh up` : `org1-ca` 와 `orderer-ca` 두 개를 구성함.
+  - `./ca.sh create` : `org1-ca`와 `orderer-ca` 두 개를 구성 후 node와 admin 을 위한 각종 crypto materials 를 생성.
+  - `./ca.sh up` : `org1-ca` 와 `orderer-ca` 두 개를 구성함. (기존에 생성한 cryto materials를 그대로 이용)
   - `./ca.sh down` : 두개의 ca 를 종료 (저장된 데이터는 삭제하지 않음, -clear 옵션을 주면 ca 내부 데이터 모두 삭제)
 
 ### 2. Peer 노드 구성하기

@@ -1,9 +1,13 @@
 #!/bin/bash
 
+function create() {
+    ./ca.sh create
+    ./createNodes.sh up
+    ./channel.sh createChannel -ca -c mychannel
+}
 function up() {
     ./ca.sh up
     ./createNodes.sh up
-    ./channel.sh createChannel -ca -c mychannel
 }
 
 function makeClear() {
@@ -26,8 +30,10 @@ function powerOffDNSServer() {
 }
 
 mode=$1
+if [ "$mode" = "create" ]; then
+    create
 if [ "$mode" = "up" ]; then
-    up
+    up  
 elif [ "$mode" = "down" ]; then
     powerOffDNSServer
     down

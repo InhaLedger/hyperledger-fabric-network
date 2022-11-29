@@ -2,13 +2,16 @@ package com.inha.coinkaraoke;
 
 import com.inha.coinkaraoke.entity.Proposal;
 import com.inha.coinkaraoke.entity.Stake;
+import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.ProposalService;
-import com.inha.coinkaraoke.ledgerApi.entityUtils.ObjectMapperHolder;
+import com.inha.coinkaraoke.ledgerApi.impl.AccountServiceImpl;
 import com.inha.coinkaraoke.ledgerApi.impl.ProposalServiceImpl;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.contract.ContractInterface;
 import org.hyperledger.fabric.contract.annotation.Contract;
 import org.hyperledger.fabric.contract.annotation.Info;
+import org.hyperledger.fabric.contract.annotation.Transaction;
+import org.hyperledger.fabric.contract.annotation.Transaction.TYPE;
 
 @Contract(name = "ProposalContract",
         info = @Info(title = "Proposal contract",
@@ -17,19 +20,18 @@ import org.hyperledger.fabric.contract.annotation.Info;
 public class ProposalContract implements ContractInterface {
 
     private final ProposalService proposalService;
+    private final AccountService accountService;
 
     public ProposalContract() {
         this.proposalService = ProposalServiceImpl.getInstance();
+        this.accountService = AccountServiceImpl.getInstance();
     }
 
+    @Transaction(intent = TYPE.SUBMIT)
     public Proposal createProposal(final Context ctx, String type, Long timestamp) {
 
-        byte[] rawStake = ctx.getStub()
-                .invokeChaincodeWithStringArgs(AccountContract.class.getSimpleName(), "createStakeToEdit", timestamp.toString())
-                .getPayload();
-        Stake stake = ObjectMapperHolder.deserialize(rawStake, Stake.class);
-
         String clientId = ContractUtils.getClientId(ctx);
+        Stake stake = accountService.stakeToEdit(ctx, clientId, timestamp);
 
         return proposalService.createProposal(ctx, clientId, type, timestamp, stake);
     }

@@ -38,5 +38,6 @@ public class Proposal extends Entity {
         this.timeStamp = timeStamp;
         this.editStakeKey = editStakeKey;
         this.status = ProposalStatus.PROGRESS;
+        this.makeKey();
     }
 }

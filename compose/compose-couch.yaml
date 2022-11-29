@@ -12,6 +12,7 @@ networks:
 services:
   couchdb0:
     container_name: couchdb0
+    hostname: couchdb0
     image: couchdb:3.1.1
     labels:
       service: hyperledger-fabric
@@ -41,6 +42,7 @@ services:
 
   couchdb1:
     container_name: couchdb1
+    hostname: couchdb1
     image: couchdb:3.1.1
     labels:
       service: hyperledger-fabric

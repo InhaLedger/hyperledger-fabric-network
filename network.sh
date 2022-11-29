@@ -32,7 +32,7 @@ function powerOffDNSServer() {
 mode=$1
 if [ "$mode" = "create" ]; then
     create
-if [ "$mode" = "up" ]; then
+elif [ "$mode" = "up" ]; then
     up  
 elif [ "$mode" = "down" ]; then
     powerOffDNSServer

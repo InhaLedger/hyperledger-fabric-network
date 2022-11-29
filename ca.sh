@@ -173,7 +173,7 @@ if [ "$MODE" == "create" ]; then
   infoln "Starting CAs using ${CRYPTO}"
   caUp
   createOrgs # register orgs to CAs including admin users.
-elif ["$MODE" == "up" ]; then
+elif [ "$MODE" == "up" ]; then
   infoln "Starting CAs using ${CRYPTO}"
   caUp
 

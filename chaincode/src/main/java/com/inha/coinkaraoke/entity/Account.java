@@ -26,7 +26,8 @@ public class Account extends Entity {
     @Property private String ownerId;
     @Property private Double availableBalance;
     @Property private Double stakedBalance;
-    @Property private TreeMap<Long, Stake> stakeList;
+    @Property private TreeMap<Long, Stake> stakeList =
+            new TreeMap<>((Comparator<Long> & Serializable) Long::compareTo);
 
 
     @Override

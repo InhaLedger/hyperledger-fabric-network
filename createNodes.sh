@@ -70,11 +70,10 @@ function peerUp() {
 function peerDown() {
 
     COMPOSE_FILES="-f compose/${COMPOSE_FILE_BASE} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE} -f compose/${COMPOSE_FILE_COUCH} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_COUCH}"
-  
-    DOCKER_SOCK=$DOCKER_SOCK ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} down --remove-orphans
 
   if [ "$CLEAR" == "true" ]; then
   
+    DOCKER_SOCK=$DOCKER_SOCK ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} down --volumes --remove-orphans
     # Bring down the network, deleting the volumes
     ${CONTAINER_CLI} volume rm docker_orderer.coinkaraoke.com docker_peer0.org1.coinkaraoke.com docker_peer1.org1.coinkaraoke.com
 
@@ -92,6 +91,9 @@ function peerDown() {
    
     # remove channel and script artifacts
     ${CONTAINER_CLI} run --rm -v "$(pwd):/data" busybox sh -c 'cd /data && rm -rf channel-artifacts log.txt *.tar.gz'
+  else
+
+    DOCKER_SOCK=$DOCKER_SOCK ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} down --remove-orphans
   fi
 
 }

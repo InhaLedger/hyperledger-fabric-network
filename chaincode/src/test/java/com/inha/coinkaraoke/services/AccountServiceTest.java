@@ -2,6 +2,7 @@ package com.inha.coinkaraoke.services;
 
 import com.inha.coinkaraoke.entity.Account;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManager;
+import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import com.inha.coinkaraoke.ledgerApi.impl.AccountServiceImpl;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.shim.ChaincodeException;
@@ -65,7 +66,7 @@ public class AccountServiceTest {
 
             Account existedAccount = new Account("user1");
             existedAccount.receive(543.365);
-            given(entityManager.getById(any(), eq("user1"), any())).willReturn(Optional.of(existedAccount));
+            given(entityManager.getById(any(), eq(Key.of("user1")), any())).willReturn(Optional.of(existedAccount));
 
             Account returned = accountService.getAccount(ctx, "user1");
 
@@ -99,8 +100,8 @@ public class AccountServiceTest {
             Account sender = new Account(senderId);
             sender.receive(100.0);
             Account receiver = new Account(receiverId);
-            given(entityManager.getById(any(), eq(senderId), any())).willReturn(Optional.of(sender));
-            given(entityManager.getById(any(), eq(receiverId), any())).willReturn(Optional.of(receiver));
+            given(entityManager.getById(any(), eq(Key.of(senderId)), any())).willReturn(Optional.of(sender));
+            given(entityManager.getById(any(), eq(Key.of(receiverId)), any())).willReturn(Optional.of(receiver));
             doNothing().when(entityManager).saveEntity(any(), any());
 
             accountService.transfer(ctx, senderId, receiverId, 12313243L, 13.2);

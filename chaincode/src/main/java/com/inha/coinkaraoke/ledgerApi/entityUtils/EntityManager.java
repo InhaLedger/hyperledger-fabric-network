@@ -30,7 +30,7 @@ public class EntityManager {
     }
 
     @Transaction(intent = TYPE.EVALUATE)
-    public Optional<Entity> getById(ChaincodeStub stub, String key, Class<?> cls) {
+    public Optional<Entity> getById(ChaincodeStub stub, Key key, Class<?> cls) {
 
         CompositeKey compositeKey = stub.createCompositeKey(cls.getSimpleName(), Entity.splitKey(key));
         byte[] data = stub.getState(compositeKey.toString());

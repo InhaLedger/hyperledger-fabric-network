@@ -6,19 +6,17 @@ import java.io.Serializable;
 
 public abstract class Entity implements Serializable {
 
-    protected static final String INDEX_KEY_DELIMITER = ":";
-
     @JsonIgnore
-    protected String key;
+    protected Key key;
 
-    static String[] splitKey(String key) {
+    static String[] splitKey(Key key) {
 
-        return key.split(":");
+        return key.split();
     }
 
     abstract protected void makeKey();
 
-    public String getKey(){
+    public Key getKey(){
         return key;
     }
 

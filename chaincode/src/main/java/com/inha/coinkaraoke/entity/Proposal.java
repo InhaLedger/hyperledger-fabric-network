@@ -2,6 +2,7 @@ package com.inha.coinkaraoke.entity;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
+import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,14 +25,18 @@ public class Proposal extends Entity {
     @Property private String userId;
     @Property private Long timeStamp;  // last modified
     @Property private ProposalStatus status;
-    @Property private String editStakeKey;
+    @Property private Key editStakeKey;
+
+    public Boolean isUnderProgress() {
+        return this.status == ProposalStatus.PROGRESS;
+    }
 
     @Override
     protected void makeKey() {
-        this.key = String.join(INDEX_KEY_DELIMITER, id.toString(), userId, type);
+        this.key = Key.of(id.toString());
     }
 
-    public Proposal(String type, String userId, Long timeStamp, String editStakeKey) {
+    public Proposal(String type, String userId, Long timeStamp, Key editStakeKey) {
         this.id = ID_GENERATOR.incrementAndGet();
         this.type = type;
         this.userId = userId;

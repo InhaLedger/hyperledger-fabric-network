@@ -3,6 +3,7 @@ package com.inha.coinkaraoke.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
+import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +33,7 @@ public class Account extends Entity {
 
     @Override
     protected void makeKey() {
-        this.key = String.join(INDEX_KEY_DELIMITER, ownerId);
+        this.key = Key.of(ownerId);
     }
 
     @JsonIgnore

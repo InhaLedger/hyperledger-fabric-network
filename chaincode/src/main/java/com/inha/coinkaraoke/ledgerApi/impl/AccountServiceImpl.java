@@ -6,9 +6,11 @@ import com.inha.coinkaraoke.entity.TransferHistory;
 import com.inha.coinkaraoke.entity.TransferHistory.Builder;
 import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManager;
-import java.util.Objects;
+import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.shim.ChaincodeException;
+
+import java.util.Objects;
 
 /**
  * This class is singleton. Do not have any shared state variables.
@@ -17,9 +19,10 @@ public class AccountServiceImpl implements AccountService {
 
     private final EntityManager entityManager;
 
+    @Override
     public Account getAccount(final Context ctx, String userId) {
 
-        return (Account) entityManager.getById(ctx.getStub(), userId, Account.class)
+        return (Account) entityManager.getById(ctx.getStub(), Key.of(userId), Account.class)
                 .orElse(new Account(userId));
     }
 

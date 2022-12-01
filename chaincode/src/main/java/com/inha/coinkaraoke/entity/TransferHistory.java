@@ -2,6 +2,7 @@ package com.inha.coinkaraoke.entity;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
+import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class TransferHistory extends Entity {
 
     @Override
     protected void makeKey() {
-        this.key = String.join(INDEX_KEY_DELIMITER, this.timestamp.toString(), this.senderId, this.receiverId);
+        this.key = Key.of(this.timestamp.toString(), this.senderId, this.receiverId);
     }
 
     public static class Builder {

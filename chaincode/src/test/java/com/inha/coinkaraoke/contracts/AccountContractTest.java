@@ -44,7 +44,7 @@ public class AccountContractTest {
         when(ctx.getClientIdentity()).thenReturn(identity);
         when(identity.getX509Certificate()).thenReturn(certificate);
         when(certificate.getSubjectDN()).thenReturn(principal);
-        when(principal.getName()).thenReturn("user1");
+        when(principal.getName()).thenReturn("CN=user1");
     }
 
     @Test

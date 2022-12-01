@@ -2,6 +2,7 @@ package com.inha.coinkaraoke.entity;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
+import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ public class Stake extends Entity {
 
     @Override
     protected void makeKey() {
-        this.key = String.join(INDEX_KEY_DELIMITER, userId, timestamp.toString());
+        this.key = Key.of(userId, timestamp.toString());
     }
 
     public static Stake forEdit(String userId, Long timestamp) {
@@ -53,9 +54,3 @@ public class Stake extends Entity {
         return instance;
     }
 }
-
-/* *
- * 1. 게시글 작성 스마트 컨트랙트 작성하기 -> stake 관련 로직도 함께 작성
- * 2. 투표 스마트 컨트랙트 작성하기
- * 3. 보상 컨트랙트 작성하기. (mint, 송금)
- */

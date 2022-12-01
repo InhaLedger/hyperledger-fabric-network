@@ -3,6 +3,7 @@ package com.inha.coinkaraoke.entities;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
+import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.ObjectMapperHolder;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ public class ObjectMapperHolderTest {
 
         @Override
         protected void makeKey() {
-            this.key = String.join(INDEX_KEY_DELIMITER, this.getClass().getSimpleName(), this.name);
+            this.key = Key.of(this.name);
         }
     }
 

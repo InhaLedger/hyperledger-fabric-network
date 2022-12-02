@@ -16,7 +16,7 @@ public interface ProposalService {
      * @param stake required to propose edit.
      * @return {@link Proposal}
      */
-    Proposal createProposal(final Context ctx, String proposerId, String type, Long timestamp, Stake stake);
+    Proposal createProposal(final Context ctx, String proposalId, String proposerId, String type, Long timestamp, Stake stake);
 
     /**
      * @param proposalId unique id of proposal

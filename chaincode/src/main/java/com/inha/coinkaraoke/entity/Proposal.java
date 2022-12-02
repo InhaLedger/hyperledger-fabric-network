@@ -17,9 +17,7 @@ import org.hyperledger.fabric.contract.annotation.Property;
 @JsonPropertyOrder({"id", "userId", "type", "timeStamp", "status", "editStakeKey"})
 public class Proposal extends Entity {
 
-    private static AtomicLong ID_GENERATOR = new AtomicLong();
-
-    @Property private Long id;
+    @Property private String id;
     @Property private String type;
     @Property private String userId;
     @Property private Long timeStamp;  // last modified
@@ -36,8 +34,8 @@ public class Proposal extends Entity {
         this.key = Key.of(id, type);
     }
 
-    public Proposal(String type, String userId, Long timeStamp, Key editStakeKey) {
-        this.id = ID_GENERATOR.incrementAndGet();
+    public Proposal(String id, String type, String userId, Long timeStamp, Key editStakeKey) {
+        this.id = id;
         this.type = type;
         this.userId = userId;
         this.timeStamp = timeStamp;

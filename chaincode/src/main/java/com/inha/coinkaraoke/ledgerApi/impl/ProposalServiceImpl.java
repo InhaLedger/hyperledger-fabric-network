@@ -14,9 +14,10 @@ public class ProposalServiceImpl implements ProposalService {
 
     private final EntityManager entityManager;
 
-    public Proposal createProposal(final Context ctx, String userId, String type, Long timestamp, Stake stake) {
+    @Override
+    public Proposal createProposal(final Context ctx, String id, String userId, String type, Long timestamp, Stake stake) {
 
-        Proposal proposal = new Proposal(type, userId, timestamp, stake.getKey());
+        Proposal proposal = new Proposal(id, type, userId, timestamp, stake.getKey());
         entityManager.saveEntity(ctx.getStub(), proposal);
 
         return proposal;

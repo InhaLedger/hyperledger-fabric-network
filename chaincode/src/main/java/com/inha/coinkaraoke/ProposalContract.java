@@ -34,12 +34,12 @@ public class ProposalContract implements ContractInterface {
     }
 
     @Transaction(intent = TYPE.SUBMIT)
-    public Proposal createProposal(final Context ctx, String type, Long timestamp) {
+    public Proposal createProposal(final Context ctx, String proposalId, String type, Long timestamp) {
 
         String clientId = ContractUtils.getClientId(ctx);
         Stake stake = accountService.stakeToEdit(ctx, clientId, timestamp);
 
-        return proposalService.createProposal(ctx, clientId, type, timestamp, stake);
+        return proposalService.createProposal(ctx, proposalId, clientId, type, timestamp, stake);
     }
 
     @Transaction(intent = TYPE.EVALUATE)

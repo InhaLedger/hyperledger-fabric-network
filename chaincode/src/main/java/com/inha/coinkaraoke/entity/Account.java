@@ -48,7 +48,7 @@ public class Account extends Entity {
 
         this.availableBalance -= amount;
         this.stakedBalance += amount;
-        this.stakeList.put(stake.getCompleteTimestamp(), stake);
+        this.stakeList.put(stake.getTimestamp(), stake);
     }
 
     public void transfer(Double amount) {
@@ -64,7 +64,6 @@ public class Account extends Entity {
 
     public Account(String ownerId) {
         this.ownerId = ownerId;
-        this.stakeList = new TreeMap<>((Comparator<Long> & Serializable) Long::compareTo);  // serializable 하도록 comparator 설정
         this.availableBalance = 0.0d;
         this.stakedBalance = 0.0d;
         this.makeKey();

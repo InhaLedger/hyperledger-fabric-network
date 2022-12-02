@@ -53,4 +53,15 @@ public class Stake extends Entity {
 
         return instance;
     }
+
+    public static Stake forVote(String userId, Double amounts, Long timestamp) {
+        Stake instance = new Stake();
+        instance.userId = userId;
+        instance.amount = amounts;
+        instance.timestamp = timestamp;
+        instance.completeTimestamp = timestamp + DEFAULT_STAKE_PERIOD;
+        instance.makeKey();
+
+        return instance;
+    }
 }

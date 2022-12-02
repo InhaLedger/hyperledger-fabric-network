@@ -1,6 +1,7 @@
 package com.inha.coinkaraoke.ledgerApi.entityUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
@@ -8,13 +9,13 @@ public class Key {
 
     protected static final String INDEX_KEY_DELIMITER = ":";
 
-    @JsonIgnore
     private final String value;
 
     public static Key of(String... values) {
         return new Key(String.join(INDEX_KEY_DELIMITER, values));
     }
-    private Key(String value) {
+    @JsonCreator
+    private Key(@JsonProperty("value") String value) {
         this.value = value;
     }
 
@@ -33,5 +34,9 @@ public class Key {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    public String getValue() {
+        return this.value;
     }
 }

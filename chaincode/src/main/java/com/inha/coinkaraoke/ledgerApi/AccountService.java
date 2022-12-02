@@ -20,6 +20,8 @@ public interface AccountService {
      */
     Stake stakeToEdit(final Context ctx, String proposerId, Long timestamp);
 
+    Stake stakeToVote(final Context ctx, String proposerId, Double amounts, Long timestamp);
+
     /**
      * Note that the order of transactions is important. Account-based model can be failed easily
      * because of the CouchDB's MVCC feature. To avoid version conflict, we need to make the interval

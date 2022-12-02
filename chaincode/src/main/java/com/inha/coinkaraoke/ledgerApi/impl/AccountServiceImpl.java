@@ -38,6 +38,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Stake stakeToVote(final Context ctx, String proposerId, Double amounts, Long timestamp) {
+
+        Stake stake = Stake.forVote(proposerId, amounts, timestamp);
+        Account account = getAccount(ctx, proposerId);
+        account.addStake(stake);
+        entityManager.saveEntity(ctx.getStub(), account);
+
+        return stake;
+    }
+
+    @Override
     public void transfer(final Context ctx, String senderId, String receiverId, Long timestamp, Double amount) {
 
         //sender

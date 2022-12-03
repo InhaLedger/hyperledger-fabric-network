@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProposalSerializeTest {
 
     @Nested
-    public class proposalTest {
+    public class ProposalTest {
         @Test
         @DisplayName("proposal 를 deterministic 하게 직렬화 한다.")
         public void serializeProposalTest() throws JsonProcessingException {
@@ -25,7 +25,7 @@ public class ProposalSerializeTest {
             Proposal proposal = new Proposal("123", "board1", "user1", 12394812L, stake.getKey());
 
             String json = new ObjectMapper().writeValueAsString(proposal);
-            assertThat(json).isEqualTo("{\"id\":\"123\",\"userId\":\"user1\",\"type\":\"board1\",\"timeStamp\":12394812,\"status\":\"PROGRESS\",\"editStakeKey\":{\"value\":\"user1:12394812\"}}");
+            assertThat(json).isEqualTo("{\"id\":\"123\",\"userId\":\"user1\",\"type\":\"board1\",\"timeStamp\":12394812,\"status\":\"PROGRESS\",\"upVotes\":0.0,\"downVotes\":0.0,\"editStakeKey\":{\"value\":\"user1:12394812\"}}");
 
             byte[] bytes = ObjectMapperHolder.serialize(proposal);
             assertThat(bytes).isEqualTo(json.getBytes(StandardCharsets.UTF_8));

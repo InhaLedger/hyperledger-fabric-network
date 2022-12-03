@@ -33,10 +33,12 @@ public class Vote extends Entity {
         this.key = Key.of(Arrays.toString(proposalKey.split()), userId);
     }
 
-    public static Vote to(Proposal proposal, Stake stake, String voteType) {
+    public static Vote to(Proposal proposal, final Stake stake, final String voteType) {
 
         if (!Objects.equals(voteType, "up") && !Objects.equals(voteType, "down"))
             throw new IllegalArgumentException("vote type must be \"up\" or \"down\".");
+
+        proposal.getVotes(voteType, stake.getAmount());
 
         return new Vote(stake.getKey(), stake.getTimestamp(), stake.getUserId(), voteType, stake.getAmount(), proposal.getKey());
     }

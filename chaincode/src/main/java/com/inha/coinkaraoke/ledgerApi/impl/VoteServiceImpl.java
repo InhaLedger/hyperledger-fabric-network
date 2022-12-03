@@ -13,9 +13,9 @@ public class VoteServiceImpl implements VoteService {
 
 
     @Override
-    public Vote createAndSave(final Context ctx, Proposal proposal, Stake stake) {
+    public Vote createAndSave(final Context ctx, Proposal proposal, Stake stake, String voteType) {
 
-        Vote vote = Vote.to(proposal, stake);
+        Vote vote = Vote.to(proposal, stake, voteType);
         entityManager.saveEntity(ctx.getStub(), vote);
 
         return vote;

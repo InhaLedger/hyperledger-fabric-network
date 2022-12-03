@@ -47,11 +47,11 @@ public class ProposalSerializeTest {
             Proposal proposal = new Proposal("123", "board1", "user1", 12394812L, stake.getKey());
 
             Stake forVote = Stake.forVote("user2", 2.1, 12399912L);
-            Vote vote = Vote.to(proposal, forVote);
+            Vote vote = Vote.to(proposal, forVote, "up");
 
 
             String json = new ObjectMapper().writeValueAsString(vote);
-            assertThat(json).isEqualTo("{\"stakeKey\":{\"value\":\"user2:12399912\"},\"userId\":\"user2\",\"proposalKey\":{\"value\":\"123:board1\"},\"amounts\":2.1,\"processed\":false,\"rewarded\":false,\"timestamp\":12399912}");
+            assertThat(json).isEqualTo("{\"voteType\":\"up\",\"stakeKey\":{\"value\":\"user2:12399912\"},\"userId\":\"user2\",\"proposalKey\":{\"value\":\"123:board1\"},\"amounts\":2.1,\"processed\":false,\"rewarded\":false,\"timestamp\":12399912}");
             System.out.println(json);
 
             byte[] bytes = ObjectMapperHolder.serialize(vote);

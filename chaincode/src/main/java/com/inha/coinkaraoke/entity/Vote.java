@@ -11,11 +11,12 @@ import org.hyperledger.fabric.contract.annotation.DataType;
 import org.hyperledger.fabric.contract.annotation.Property;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 @DataType
 @Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonPropertyOrder({"stakeKey", "userId", "proposalKey", "amounts", "processed", "rewarded", "timestamp"})
+@JsonPropertyOrder({"voteType", "stakeKey", "userId", "proposalKey", "amounts", "processed", "rewarded", "timestamp"})
 public class Vote extends Entity {
 
     @Property private Key stakeKey;
@@ -24,6 +25,7 @@ public class Vote extends Entity {
     @Property private Double amounts;
     @Property private Boolean processed;
     @Property private Boolean rewarded;
+    @Property private String voteType;
     @Property private Key proposalKey;
 
     @Override
@@ -31,12 +33,15 @@ public class Vote extends Entity {
         this.key = Key.of(Arrays.toString(proposalKey.split()), userId);
     }
 
-    public static Vote to(Proposal proposal, Stake stake) {
+    public static Vote to(Proposal proposal, Stake stake, String voteType) {
 
-        return new Vote(stake.getKey(), stake.getTimestamp(), stake.getUserId(),stake.getAmount(), proposal.getKey());
+        if (!Objects.equals(voteType, "up") && !Objects.equals(voteType, "down"))
+            throw new IllegalArgumentException("vote type must be \"up\" or \"down\".");
+
+        return new Vote(stake.getKey(), stake.getTimestamp(), stake.getUserId(), voteType, stake.getAmount(), proposal.getKey());
     }
 
-    private Vote(Key stakeKey, Long timestamp, String userId, Double amounts, Key proposalKey) {
+    private Vote(Key stakeKey, Long timestamp, String userId, String voteType, Double amounts, Key proposalKey) {
         this.stakeKey = stakeKey;
         this.timestamp = timestamp;
         this.userId = userId;
@@ -44,6 +49,7 @@ public class Vote extends Entity {
         this.processed = false;
         this.rewarded = false;
         this.proposalKey = proposalKey;
+        this.voteType = voteType;
         this.makeKey();
     }
 }

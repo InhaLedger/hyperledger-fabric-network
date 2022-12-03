@@ -50,7 +50,7 @@ public class ProposalContract implements ContractInterface {
     }
 
     @Transaction(intent = TYPE.SUBMIT)
-    public Vote vote(final Context ctx, String proposalId, String type, Double amounts, Long timestamp) {
+    public Vote vote(final Context ctx, String proposalId, String type, String voteType, Double amounts, Long timestamp) {
 
         Proposal proposal = proposalService.findProposal(ctx, proposalId, type)
                 .orElseThrow(() -> new ChaincodeException("not found such proposal."));
@@ -62,6 +62,6 @@ public class ProposalContract implements ContractInterface {
         String clientId = ContractUtils.getClientId(ctx);
         Stake stake = accountService.stakeToVote(ctx, clientId, amounts, timestamp);
 
-        return voteService.createAndSave(ctx, proposal, stake);
+        return voteService.createAndSave(ctx, proposal, stake, voteType);
     }
 }

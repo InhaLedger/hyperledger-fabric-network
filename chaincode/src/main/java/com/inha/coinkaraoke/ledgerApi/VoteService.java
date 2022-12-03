@@ -13,5 +13,5 @@ public interface VoteService {
      * @param stake required for voting.
      * @return {@link Vote}
      */
-    Vote createAndSave(final Context ctx, Proposal proposal, Stake stake);
+    Vote createAndSave(final Context ctx, Proposal proposal, Stake stake, String voteType);
 }

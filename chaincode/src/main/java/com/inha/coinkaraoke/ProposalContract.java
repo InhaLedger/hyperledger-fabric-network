@@ -15,7 +15,7 @@ import org.hyperledger.fabric.contract.annotation.Contract;
 import org.hyperledger.fabric.contract.annotation.Info;
 import org.hyperledger.fabric.contract.annotation.Transaction;
 import org.hyperledger.fabric.contract.annotation.Transaction.TYPE;
-import org.hyperledger.fabric.shim.ChaincodeException;
+import java.util.NoSuchElementException;
 
 @Contract(name = "ProposalContract",
         info = @Info(title = "Proposal contract",
@@ -53,10 +53,10 @@ public class ProposalContract implements ContractInterface {
     public Vote vote(final Context ctx, String proposalId, String type, String voteType, Double amounts, Long timestamp) {
 
         Proposal proposal = proposalService.findProposal(ctx, proposalId, type)
-                .orElseThrow(() -> new ChaincodeException("not found such proposal."));
+                .orElseThrow(() -> new NoSuchElementException("not found such proposal."));
 
         if (!proposal.isUnderProgress()) {
-            throw new ChaincodeException("Cannot vote to this proposal. This proposal has been closed");
+            throw new IllegalStateException("Cannot vote to this proposal. This proposal has been closed");
         }
 
         String clientId = ContractUtils.getClientId(ctx);

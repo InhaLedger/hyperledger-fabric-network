@@ -8,7 +8,6 @@ import com.inha.coinkaraoke.ledgerApi.AccountService;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.EntityManager;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
 import org.hyperledger.fabric.contract.Context;
-import org.hyperledger.fabric.shim.ChaincodeException;
 
 import java.util.Objects;
 
@@ -18,6 +17,7 @@ import java.util.Objects;
 public class AccountServiceImpl implements AccountService {
 
     private final EntityManager entityManager;
+    private final static String SYSTEM_ACCOUNT = "admin";
 
     @Override
     public Account getAccount(final Context ctx, String userId) {
@@ -69,15 +69,20 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void mint(final Context ctx, String minterId, Double amount) {
+    public void transferFromSystemTo(Context ctx, String receiverId, Long timestamp, Double amount) {
+        this.transfer(ctx, SYSTEM_ACCOUNT, receiverId, timestamp, amount);
+    }
 
-        if (Objects.equals(minterId, "admin")) {
+    @Override
+    public void mint(final Context ctx, String minterId, Double amount) throws IllegalAccessException {
+
+        if (Objects.equals(minterId, SYSTEM_ACCOUNT)) {
 
             Account adminAccount = this.getAccount(ctx, minterId);
             adminAccount.receive(amount);
             entityManager.updateEntity(ctx.getStub(), adminAccount);
         } else {
-            throw new ChaincodeException("only admin can access to mint new tokens");
+            throw new IllegalAccessException("only admin can access to mint new tokens");
         }
     }
 

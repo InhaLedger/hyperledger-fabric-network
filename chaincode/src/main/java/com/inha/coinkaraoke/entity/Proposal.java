@@ -20,7 +20,7 @@ public class Proposal extends Entity {
     @Property private String id;
     @Property private String type;
     @Property private String userId;
-    @Property private Long timeStamp;  // last modified
+    @Property private Long timeStamp;
     @Property private ProposalStatus status;
     @Property private Key editStakeKey;
     @Property private Double upVotes;

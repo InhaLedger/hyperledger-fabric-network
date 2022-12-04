@@ -62,7 +62,7 @@ public class AccountContract implements ContractInterface {
     }
 
     @Transaction(intent = TYPE.SUBMIT)
-    public void mint(final Context ctx, Double amount) {
+    public void mint(final Context ctx, Double amount) throws IllegalAccessException {
 
         String clientId = ContractUtils.getClientId(ctx);
         logger.info("[Account Contract] call mint : {} try to mint ({}) coins", clientId, amount);

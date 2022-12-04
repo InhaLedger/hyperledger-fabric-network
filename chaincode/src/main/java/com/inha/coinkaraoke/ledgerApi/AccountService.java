@@ -35,10 +35,12 @@ public interface AccountService {
      */
     void transfer(final Context ctx, String senderId, String receiverId, Long timestamp, Double amount);
 
+    void transferFromSystemTo(final Context ctx, String receiverId, Long timestamp, Double amount);
+
     /**
      * Only admin can create new coins.
      * @param amount for minting.
      * @exception ChaincodeException request has not authorized. Only admin can call this function.
      */
-    void mint(final Context ctx, String minterId, Double amount);
+    void mint(final Context ctx, String minterId, Double amount) throws IllegalAccessException;
 }

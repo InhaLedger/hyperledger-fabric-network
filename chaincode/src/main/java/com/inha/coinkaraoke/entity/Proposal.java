@@ -63,4 +63,8 @@ public class Proposal extends Entity {
             this.downVotes += amounts;
         }
     }
+
+    public void markAsFinalized() {
+        this.status = ProposalStatus.COMPLETE;
+    }
 }

@@ -24,4 +24,14 @@ public interface ProposalService {
      * @return {@link Optional<Proposal>}
      */
     Optional<Proposal> findProposal(final Context ctx, String proposalId, String type);
+
+    /**
+     * Calculate rewards for proposal editors and its voters.
+     * @param timestamp exact time when requests to finalize {@link Proposal}s.
+     * @param rewardPerProposal rewards to be allocated per a proposal. This reward is divided into two share which
+     *                          one is for editor another is for voters
+     * @param batchSize The number of proposals to be finalized at one transaction. This must not be too big.
+     * @return The number of proposals which are successfully finalized.
+     */
+    Integer finalizeProposals(final Context ctx, Long timestamp, Double rewardPerProposal, Integer batchSize);
 }

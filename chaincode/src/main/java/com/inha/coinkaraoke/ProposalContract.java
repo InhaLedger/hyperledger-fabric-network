@@ -64,4 +64,10 @@ public class ProposalContract implements ContractInterface {
 
         return voteService.createAndSave(ctx, proposal, stake, voteType);
     }
+
+    @Transaction(intent = TYPE.SUBMIT)
+    public Integer finalize(final Context ctx, Long timestamp, Double rewardPerProposal, Integer batchSize) {
+
+        return proposalService.finalizeProposals(ctx, timestamp, rewardPerProposal, batchSize);
+    }
 }

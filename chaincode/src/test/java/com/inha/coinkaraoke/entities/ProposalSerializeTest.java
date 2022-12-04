@@ -62,6 +62,35 @@ public class ProposalSerializeTest {
                     .usingRecursiveComparison()
                     .isEqualTo(vote);
         }
+
+        @Test
+        public void deserializeTest() {
+            String json = "{\n" +
+                    "  \"amounts\": 2.3,\n" +
+                    "  \"proposalKey\": {\n" +
+                    "    \"value\": \"52f6c60e-0864-437e-8379-83639a0caa43:packboard\"\n" +
+                    "  },\n" +
+                    "  \"processed\": false,\n" +
+                    "  \"rewarded\": false,\n" +
+                    "  \"stakeKey\": {\n" +
+                    "    \"value\": \"47:1670150679912\"\n" +
+                    "  },\n" +
+                    "  \"timestamp\": 1670150679912,\n" +
+                    "  \"userId\": \"47\",\n" +
+                    "  \"voteType\": \"down\"\n" +
+                    "}";
+            Vote vote = ObjectMapperHolder.deserialize(json.getBytes(), Vote.class);
+
+            assertThat(vote.getVoteType()).isEqualTo("down");
+            assertThat(vote.isProcessed()).isEqualTo(false);
+            assertThat(vote.getRewarded()).isEqualTo(false);
+            assertThat(vote.getAmounts()).isEqualTo(2.3);
+            assertThat(vote.getTimestamp()).isEqualTo(1670150679912L);
+            assertThat(vote.getUserId()).isEqualTo("47");
+            assertThat(vote.getProposalKey().getValue()).isEqualTo("52f6c60e-0864-437e-8379-83639a0caa43:packboard");
+            assertThat(vote.getStakeKey().getValue()).isEqualTo("47:1670150679912");
+        }
+
     }
 
 

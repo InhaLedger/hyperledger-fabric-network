@@ -1,5 +1,6 @@
 package com.inha.coinkaraoke.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Entity;
 import com.inha.coinkaraoke.ledgerApi.entityUtils.Key;
@@ -53,5 +54,29 @@ public class Vote extends Entity {
         this.proposalKey = proposalKey;
         this.voteType = voteType;
         this.makeKey();
+    }
+
+    @JsonIgnore
+    public Boolean isUpVote() {
+        return this.voteType.equals("up");
+    }
+
+    @JsonIgnore
+    public Boolean isDownVote() {
+        return this.voteType.equals("down");
+    }
+
+    public Boolean isProcessed() {
+        return this.processed;
+    }
+
+    public void markAsRewarded() {
+        this.rewarded = true;
+        this.processed = true;
+    }
+
+    public void markAsNotRewarded() {
+        this.rewarded = false;
+        this.processed = true;
     }
 }
